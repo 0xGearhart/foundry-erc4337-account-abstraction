@@ -6,4 +6,6 @@ import {BasicAccount} from "../src/BasicAccount.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 import {Script} from "forge-std/Script.sol";
 
-contract DeployBasicAccount is Script {}
+contract DeployBasicAccount is Script {
+    function run() external returns (BasicAccount basicAccount, address entryPoint) {}
+}
