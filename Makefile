@@ -31,4 +31,4 @@ ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
 endif
 
 deploy:
-	@forge script script/Deploy.s.sol:Deploy $(NETWORK_ARGS)
+	@forge script script/DeployBasicAccount.s.sol:DeployBasicAccount $(NETWORK_ARGS)
