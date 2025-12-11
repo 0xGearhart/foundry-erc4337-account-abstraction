@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all clean deploy fund install snapshot coverageReport anvil
+.PHONY: all clean deploy fund install snapshot coverageReport gasReport anvil
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -17,10 +17,14 @@ install :; forge install foundry-rs/forge-std@v1.11.0 && forge install openzeppe
 # Update Dependencies
 update:; forge update
 
+# Create test coverage report and save to .txt file
+coverageReport :; forge coverage --report debug > coverage.txt
+
+# Generate Gas Snapshot
 snapshot :; forge snapshot
 
-# Create Test Coverage Report And Save To .txt File
-coverageReport :; forge coverage --report debug > coverage.txt
+# Generate table showing gas cost for each function
+gasReport :; forge test --gas-report
 
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
 
