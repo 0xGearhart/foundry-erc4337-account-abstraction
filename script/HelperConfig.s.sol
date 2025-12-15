@@ -2,42 +2,130 @@
 
 pragma solidity ^0.8.24;
 
-import {Script} from "forge-std/Script.sol";
+import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {Script, console2} from "forge-std/Script.sol";
+import {EntryPoint} from "lib/account-abstraction/contracts/core/EntryPoint.sol";
 
-contract HelperConfig is Script {
+contract CodeConstants {
+    uint256 constant LOCAL_CHAIN_ID = 31_337;
+    uint256 constant ETH_MAINNET_CHAIN_ID = 1;
+    uint256 constant ETH_SEPOLIA_CHAIN_ID = 11_155_111;
+    uint256 constant ARBITRUM_MAINNET_CHAIN_ID = 42_161;
+    uint256 constant ARBITRUM_SEPOLIA_CHAIN_ID = 421_614;
+    uint256 constant ANVIL_DEFAULT_KEY = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    address constant ANVIL_DEFAULT_ACCOUNT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+}
+
+contract HelperConfig is Script, CodeConstants {
+    /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
+
     error HelperConfig__InvalidNetwork(uint256 chainId);
 
-    uint256 public constant LOCAL_CHAIN_ID = 31_337;
-    uint256 public constant ETH_MAINNET_CHAIN_ID = 1;
-    uint256 public constant ETH_SEPOLIA_CHAIN_ID = 11_155_111;
+    /*//////////////////////////////////////////////////////////////
+                                STRUCTS
+    //////////////////////////////////////////////////////////////*/
 
-    address public constant ETH_MAINNET_ENTRY_POINT = address(0);
-    address public constant ETH_SEPOLIA_ENTRY_POINT = address(0);
+    struct NetworkConfig {
+        address entryPoint;
+        address usdc;
+        address sender;
+    }
 
-    function run() external view returns (address entryPoint, address sender) {
-        if (block.chainid == ETH_MAINNET_CHAIN_ID) {
-            return _getEthMainnetConfig();
-        } else if (block.chainid == ETH_SEPOLIA_CHAIN_ID) {
-            return _getEthSepoliaConfig();
-        } else if (block.chainid == LOCAL_CHAIN_ID) {
+    /*//////////////////////////////////////////////////////////////
+                                 STATE
+    //////////////////////////////////////////////////////////////*/
+
+    NetworkConfig localNetworkConfig;
+    mapping(uint256 chainId => NetworkConfig) networkConfigs;
+
+    /*//////////////////////////////////////////////////////////////
+                               FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    constructor() {
+        networkConfigs[ETH_MAINNET_CHAIN_ID] = _getEthMainnetConfig();
+        networkConfigs[ETH_SEPOLIA_CHAIN_ID] = _getEthSepoliaConfig();
+        networkConfigs[ARBITRUM_MAINNET_CHAIN_ID] = _getArbMainnetConfig();
+        networkConfigs[ARBITRUM_SEPOLIA_CHAIN_ID] = _getArbSepoliaConfig();
+    }
+
+    function getConfig() external returns (NetworkConfig memory) {
+        return getConfigByChainId(block.chainid);
+    }
+
+    function getConfigByChainId(uint256 chainId) public returns (NetworkConfig memory) {
+        if (chainId == LOCAL_CHAIN_ID) {
             return _getOrCreateLocalConfig();
+        } else if (networkConfigs[chainId].sender != address(0)) {
+            return networkConfigs[chainId];
         } else {
             revert HelperConfig__InvalidNetwork(block.chainid);
         }
     }
 
-    function _getEthMainnetConfig() internal view returns (address entryPoint, address sender) {
-        entryPoint = ETH_MAINNET_ENTRY_POINT;
-        sender = vm.envAddress("DEFAULT_KEY_ADDRESS");
+    /*//////////////////////////////////////////////////////////////
+                                CONFIGS
+    //////////////////////////////////////////////////////////////*/
+
+    function _getEthMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
+        networkConfig = NetworkConfig({
+            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032, // need to confirm later
+            usdc: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, // need to confirm later
+            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+        });
     }
 
-    function _getEthSepoliaConfig() internal view returns (address entryPoint, address sender) {
-        entryPoint = ETH_SEPOLIA_ENTRY_POINT;
-        sender = vm.envAddress("DEFAULT_KEY_ADDRESS");
+    function _getArbMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
+        networkConfig = NetworkConfig({
+            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032, // need to confirm later
+            usdc: 0xaf88d065e77c8cC2239327C5EDb3A432268e5831, // need to confirm later
+            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+        });
     }
 
-    function _getOrCreateLocalConfig() internal pure returns (address entryPoint, address sender) {
-        entryPoint = address(0);
-        sender = DEFAULT_SENDER;
+    function _getEthSepoliaConfig() internal returns (NetworkConfig memory networkConfig) {
+        console2.log("Deploying mock...");
+        vm.startBroadcast(vm.envAddress("DEFAULT_KEY_ADDRESS"));
+        ERC20Mock erc20Mock = new ERC20Mock();
+        vm.stopBroadcast();
+        console2.log("Update HelperConfig with deployed mock address: ", address(erc20Mock));
+
+        networkConfig = NetworkConfig({
+            entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789, // need to confirm later
+            usdc: address(erc20Mock), // update with my own mock token after first deploy
+            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+        });
+    }
+
+    function _getArbSepoliaConfig() internal returns (NetworkConfig memory networkConfig) {
+        console2.log("Deploying mock...");
+        vm.startBroadcast(vm.envAddress("DEFAULT_KEY_ADDRESS"));
+        ERC20Mock erc20Mock = new ERC20Mock();
+        vm.stopBroadcast();
+        console2.log("Update HelperConfig with deployed mock address: ", address(erc20Mock));
+
+        networkConfig = NetworkConfig({
+            entryPoint: address(0), // need to fill in later
+            usdc: address(erc20Mock), // update with my own mock token after first deploy
+            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+        });
+    }
+
+    function _getOrCreateLocalConfig() internal returns (NetworkConfig memory) {
+        if (networkConfigs[LOCAL_CHAIN_ID].sender != address(0)) {
+            return networkConfigs[LOCAL_CHAIN_ID];
+        }
+        console2.log("Deploying mocks...");
+        vm.startBroadcast(ANVIL_DEFAULT_ACCOUNT);
+        EntryPoint entryPoint = new EntryPoint();
+        ERC20Mock erc20Mock = new ERC20Mock();
+        vm.stopBroadcast();
+
+        localNetworkConfig =
+            NetworkConfig({entryPoint: address(entryPoint), usdc: address(erc20Mock), sender: ANVIL_DEFAULT_ACCOUNT});
+
+        return localNetworkConfig;
     }
 }

@@ -7,12 +7,12 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 import {Script} from "forge-std/Script.sol";
 
 contract DeployBasicAccount is Script {
-    function run() external returns (BasicAccount basicAccount, address entryPoint) {
-        address sender;
-        HelperConfig config = new HelperConfig();
-        (entryPoint, sender) = config.run();
-        vm.startBroadcast(sender);
-        basicAccount = new BasicAccount(entryPoint);
+    function run() external returns (BasicAccount basicAccount, HelperConfig.NetworkConfig memory config) {
+        HelperConfig helperConfig = new HelperConfig();
+        config = helperConfig.getConfig();
+
+        vm.startBroadcast(config.sender);
+        basicAccount = new BasicAccount(config.entryPoint);
         vm.stopBroadcast();
     }
 }
