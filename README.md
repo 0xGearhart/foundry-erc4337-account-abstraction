@@ -1,10 +1,10 @@
-# Foundry Account Abstraction Basic
+# Foundry ERC4337 Account Abstraction
 
 **⚠️ This is an educational project - not audited, use at your own risk**
 
 ## Table of Contents
 
-- [Foundry Account Abstraction Basic](#foundry-account-abstraction-basic)
+- [Foundry ERC4337 Account Abstraction](#foundry-erc4337-account-abstraction)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
     - [Key Features](#key-features)
