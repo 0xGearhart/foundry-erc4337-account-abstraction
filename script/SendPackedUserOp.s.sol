@@ -13,16 +13,17 @@ contract SendPackedUserOp is Script, CodeConstants {
 
     function generateSignedUserOperation(
         bytes calldata _callData,
-        HelperConfig.NetworkConfig calldata config
+        HelperConfig.NetworkConfig calldata config,
+        address basicAccount
     )
         public
         view
         returns (PackedUserOperation memory)
     {
-        // get nonce from sender
-        uint256 nonce = vm.getNonce(config.sender);
-        // generate unsigned user operation struct
-        PackedUserOperation memory userOperation = _generateUnsignedUserOperation(config.sender, nonce, _callData);
+        // get nonce from sender and decrement by 1 to get correct nonce
+        uint256 nonce = vm.getNonce(basicAccount) - 1;
+        // generate unsigned user operation struct with basicAccount contract as sender and config.sender as signer
+        PackedUserOperation memory userOperation = _generateUnsignedUserOperation(basicAccount, nonce, _callData);
 
         // get the user operation hash (userOpHash) from entry point to ensure correctness
         bytes32 userOpHash = IEntryPoint(config.entryPoint).getUserOpHash(userOperation);
