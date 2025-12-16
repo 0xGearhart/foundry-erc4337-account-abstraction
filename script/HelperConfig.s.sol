@@ -71,7 +71,7 @@ contract HelperConfig is Script, CodeConstants {
 
     function _getEthMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032, // need to confirm later
+            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032,
             usdc: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, // need to confirm later
             sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
@@ -79,7 +79,7 @@ contract HelperConfig is Script, CodeConstants {
 
     function _getArbMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032, // need to confirm later
+            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032,
             usdc: 0xaf88d065e77c8cC2239327C5EDb3A432268e5831, // need to confirm later
             sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
@@ -87,7 +87,7 @@ contract HelperConfig is Script, CodeConstants {
 
     function _getEthSepoliaConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789, // need to confirm later
+            entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789,
             usdc: 0xc25C21b67a9a6cB2220301918B08578E603573b5,
             sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
@@ -102,9 +102,11 @@ contract HelperConfig is Script, CodeConstants {
     }
 
     function _getOrCreateLocalConfig() internal returns (NetworkConfig memory) {
+        // if mocks are already deployed, return struct
         if (localNetworkConfig.sender != address(0)) {
             return localNetworkConfig;
         }
+        // otherwise, deploy mocks and save struct
         console2.log("Deploying mocks...");
         vm.startBroadcast(ANVIL_DEFAULT_ACCOUNT);
         EntryPoint entryPoint = new EntryPoint();
