@@ -85,37 +85,25 @@ contract HelperConfig is Script, CodeConstants {
         });
     }
 
-    function _getEthSepoliaConfig() internal returns (NetworkConfig memory networkConfig) {
-        console2.log("Deploying mock...");
-        vm.startBroadcast(vm.envAddress("DEFAULT_KEY_ADDRESS"));
-        ERC20Mock erc20Mock = new ERC20Mock();
-        vm.stopBroadcast();
-        console2.log("Update HelperConfig with deployed mock address: ", address(erc20Mock));
-
+    function _getEthSepoliaConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
             entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789, // need to confirm later
-            usdc: address(erc20Mock), // update with my own mock token after first deploy
+            usdc: 0xc25C21b67a9a6cB2220301918B08578E603573b5,
             sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
-    function _getArbSepoliaConfig() internal returns (NetworkConfig memory networkConfig) {
-        console2.log("Deploying mock...");
-        vm.startBroadcast(vm.envAddress("DEFAULT_KEY_ADDRESS"));
-        ERC20Mock erc20Mock = new ERC20Mock();
-        vm.stopBroadcast();
-        console2.log("Update HelperConfig with deployed mock address: ", address(erc20Mock));
-
+    function _getArbSepoliaConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: address(0), // need to fill in later
-            usdc: address(erc20Mock), // update with my own mock token after first deploy
+            entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789,
+            usdc: 0x50A7224492E22bc8923b77751E3D047c6B47CbDE,
             sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
     function _getOrCreateLocalConfig() internal returns (NetworkConfig memory) {
-        if (networkConfigs[LOCAL_CHAIN_ID].sender != address(0)) {
-            return networkConfigs[LOCAL_CHAIN_ID];
+        if (localNetworkConfig.sender != address(0)) {
+            return localNetworkConfig;
         }
         console2.log("Deploying mocks...");
         vm.startBroadcast(ANVIL_DEFAULT_ACCOUNT);
