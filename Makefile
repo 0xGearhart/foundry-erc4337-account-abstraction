@@ -30,8 +30,20 @@ anvil :; anvil -m 'test test test test test test test test test test test junk' 
 
 NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
 
-ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+ifeq ($(findstring --network eth MAINNET,$(ARGS)),--network eth MAINNET)
+	NETWORK_ARGS := --rpc-url $(ETH_MAINNET_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+endif
+
+ifeq ($(findstring --network eth sepolia,$(ARGS)),--network eth sepolia)
+	NETWORK_ARGS := --rpc-url $(ETH_SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+endif
+
+ifeq ($(findstring --network arb MAINNET,$(ARGS)),--network arb MAINNET)
+	NETWORK_ARGS := --rpc-url $(ARB_MAINNET_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+endif
+
+ifeq ($(findstring --network arb sepolia,$(ARGS)),--network arb sepolia)
+	NETWORK_ARGS := --rpc-url $(ARB_SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 endif
 
 deploy:
