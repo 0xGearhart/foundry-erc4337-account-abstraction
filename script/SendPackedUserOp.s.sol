@@ -3,6 +3,7 @@
 pragma solidity ^0.8.24;
 
 import {CodeConstants, HelperConfig} from "./HelperConfig.s.sol";
+import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {Script} from "forge-std/Script.sol";
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
@@ -22,7 +23,7 @@ contract SendPackedUserOp is Script, CodeConstants {
     {
         // get nonce from sender and decrement by 1 to get correct nonce
         uint256 nonce = vm.getNonce(basicAccount) - 1;
-        // generate unsigned user operation struct with basicAccount contract as sender and config.sender as signer
+        // generate unsigned user operation struct with basicAccount contract as sender and config.account as signer
         PackedUserOperation memory userOperation = _generateUnsignedUserOperation(basicAccount, nonce, _callData);
 
         // get the user operation hash (userOpHash) from entry point to ensure correctness
@@ -37,7 +38,7 @@ contract SendPackedUserOp is Script, CodeConstants {
         if (block.chainid == LOCAL_CHAIN_ID) {
             (v, r, s) = vm.sign(ANVIL_DEFAULT_KEY, digest);
         } else {
-            (v, r, s) = vm.sign(config.sender, digest);
+            (v, r, s) = vm.sign(config.account, digest);
         }
         // add signature to userOperation to complete struct
         userOperation.signature = abi.encodePacked(r, s, v); // make sure correct order is used

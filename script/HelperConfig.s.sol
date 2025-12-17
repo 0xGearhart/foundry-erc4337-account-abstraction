@@ -30,7 +30,7 @@ contract HelperConfig is Script, CodeConstants {
     struct NetworkConfig {
         address entryPoint;
         address usdc;
-        address sender;
+        address account;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ contract HelperConfig is Script, CodeConstants {
     function getConfigByChainId(uint256 chainId) public returns (NetworkConfig memory) {
         if (chainId == LOCAL_CHAIN_ID) {
             return _getOrCreateLocalConfig();
-        } else if (networkConfigs[chainId].sender != address(0)) {
+        } else if (networkConfigs[chainId].account != address(0)) {
             return networkConfigs[chainId];
         } else {
             revert HelperConfig__InvalidNetwork(block.chainid);
@@ -73,7 +73,7 @@ contract HelperConfig is Script, CodeConstants {
         networkConfig = NetworkConfig({
             entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032,
             usdc: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, // need to confirm later
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
@@ -81,7 +81,7 @@ contract HelperConfig is Script, CodeConstants {
         networkConfig = NetworkConfig({
             entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032,
             usdc: 0xaf88d065e77c8cC2239327C5EDb3A432268e5831, // need to confirm later
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
@@ -89,7 +89,7 @@ contract HelperConfig is Script, CodeConstants {
         networkConfig = NetworkConfig({
             entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789,
             usdc: 0xc25C21b67a9a6cB2220301918B08578E603573b5,
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
@@ -97,13 +97,13 @@ contract HelperConfig is Script, CodeConstants {
         networkConfig = NetworkConfig({
             entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789,
             usdc: 0x50A7224492E22bc8923b77751E3D047c6B47CbDE,
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
     function _getOrCreateLocalConfig() internal returns (NetworkConfig memory) {
         // if mocks are already deployed, return struct
-        if (localNetworkConfig.sender != address(0)) {
+        if (localNetworkConfig.account != address(0)) {
             return localNetworkConfig;
         }
         // otherwise, deploy mocks and save struct
@@ -114,7 +114,7 @@ contract HelperConfig is Script, CodeConstants {
         vm.stopBroadcast();
 
         localNetworkConfig =
-            NetworkConfig({entryPoint: address(entryPoint), usdc: address(erc20Mock), sender: ANVIL_DEFAULT_ACCOUNT});
+            NetworkConfig({entryPoint: address(entryPoint), usdc: address(erc20Mock), account: ANVIL_DEFAULT_ACCOUNT});
 
         return localNetworkConfig;
     }

@@ -86,18 +86,6 @@ contract BasicAccount is IAccount, Ownable {
         requireFromEntryPoint
         returns (uint256 validationData)
     {
-        // struct PackedUserOperation {
-        //     address sender;                  // this account's address
-        //     uint256 nonce;                   // nonce to prevent replay attacks
-        //     bytes initCode;                  // ignore for deployed accounts
-        //     bytes callData;                  // the operations to be executed (approve, send, etc)
-        //     bytes32 accountGasLimits;        // the amount of gas to allocate the main execution call
-        //     uint256 preVerificationGas;      // the amount of gas to allocate for the verification step
-        //     bytes32 gasFees;                 // extra gas to pay the bundler
-        //     bytes paymasterAndData;          // data for paymaster (only if paymaster exists)
-        //     bytes signature;                 // data passed to sender to verify operation
-        // }
-
         validationData = _validateSignature(userOp, userOpHash);
 
         // usually it is good practice to validate nonce as well
