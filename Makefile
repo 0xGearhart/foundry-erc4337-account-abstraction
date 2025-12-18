@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all clean deploy fund install snapshot coverageReport gasReport anvil
+.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy sendPackedUserOp
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -48,3 +48,6 @@ endif
 
 deploy:
 	@forge script script/DeployBasicAccount.s.sol:DeployBasicAccount $(NETWORK_ARGS)
+
+sendPackedUserOp:
+	@ forge script script/SendPackedUserOp.s.sol:SendPackedUserOp $(NETWORK_ARGS)

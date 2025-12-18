@@ -15,7 +15,7 @@ contract SendPackedUserOp is Script, CodeConstants {
     using MessageHashUtils for bytes32;
 
     // Make sure you trust this address - don't run this on Mainnet! Only for testing and example purposes.
-    address constant ADDRESS_TO_APPROVE = vm.envAddress("SECONDARY_ADDRESS");
+    address addressToApprove = vm.envAddress("SECONDARY_ADDRESS");
 
     function run() public {
         HelperConfig helperConfig = new HelperConfig();
@@ -24,7 +24,7 @@ contract SendPackedUserOp is Script, CodeConstants {
         address destination = config.usdc;
         uint256 value = 0;
         uint256 amountToApprove = 1e6; // 1 usdc since usdc has 6 decimals (mock has 18 decimals but still good in case script is ran on mainnet accidentally)
-        bytes memory functionData = abi.encodeWithSelector(IERC20.approve.selector, ADDRESS_TO_APPROVE, amountToApprove);
+        bytes memory functionData = abi.encodeWithSelector(IERC20.approve.selector, addressToApprove, amountToApprove);
         bytes memory executeCallData =
             abi.encodeWithSelector(BasicAccount.execute.selector, destination, value, functionData);
         PackedUserOperation memory userOp =
@@ -49,7 +49,7 @@ contract SendPackedUserOp is Script, CodeConstants {
         // get nonce from sender and decrement by 1 to get correct nonce
         uint256 nonce = vm.getNonce(basicAccount) - 1;
         // generate unsigned user operation struct with basicAccount contract as sender and config.account as signer
-        PackedUserOperation memory userOperation = _generateUnsignedUserOperation(basicAccount, nonce, _callData);
+        PackedUserOperation memory userOperation = generateUnsignedUserOperation(basicAccount, nonce, _callData);
 
         // get the user operation hash (userOpHash) from entry point to ensure correctness
         bytes32 userOpHash = IEntryPoint(config.entryPoint).getUserOpHash(userOperation);
@@ -71,12 +71,12 @@ contract SendPackedUserOp is Script, CodeConstants {
         return userOperation;
     }
 
-    function _generateUnsignedUserOperation(
+    function generateUnsignedUserOperation(
         address _sender,
         uint256 _nonce,
         bytes memory _callData
     )
-        internal
+        public
         pure
         returns (PackedUserOperation memory packedUserOp)
     {
