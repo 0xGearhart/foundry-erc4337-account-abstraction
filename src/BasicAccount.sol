@@ -24,6 +24,13 @@ contract BasicAccount is IAccount, Ownable {
     error BasicAccount__NotFromEntryPoint();
     error BasicAccount__NotFromEntryPointOrOwner();
     error BasicAccount__ExecutionFailed(bytes result);
+    error BasicAccount__WithdrawFailed();
+
+    /*//////////////////////////////////////////////////////////////
+                               LIBRARIES
+    //////////////////////////////////////////////////////////////*/
+
+    using MessageHashUtils for bytes32;
 
     /*//////////////////////////////////////////////////////////////
                                  STATE
@@ -115,6 +122,20 @@ contract BasicAccount is IAccount, Ownable {
         }
     }
 
+    /**
+     * @notice Only owner can withdraw funds from basic account
+     * @param amount amount of ETH to withdraw
+     */
+    function withdraw(uint256 amount) external onlyOwner {
+        if (amount > address(this).balance) {
+            amount = address(this).balance;
+        }
+        (bool success,) = payable(owner()).call{value: amount}("");
+        if (!success) {
+            revert BasicAccount__WithdrawFailed();
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                            INTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
@@ -133,7 +154,7 @@ contract BasicAccount is IAccount, Ownable {
         returns (uint256 validationData)
     {
         // userOpHash => EIP-191 version of the signed hash
-        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
+        bytes32 ethSignedMessageHash = userOpHash.toEthSignedMessageHash();
         // recover signer from hash
         address signer = ECDSA.recover(ethSignedMessageHash, userOp.signature);
         // verify signer is BasicAccount owner
