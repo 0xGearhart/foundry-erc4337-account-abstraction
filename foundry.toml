@@ -5,10 +5,10 @@ src = "src"
 out = "out"
 libs = ["lib"]
 remappings = ["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"]
-# fs_permissions = [
-#     { access = "read", path = "./broadcast" },
-#     { access = "read", path = "./reports" },
-# ]
+fs_permissions = [
+    { access = "read", path = "./broadcast" },
+    { access = "read", path = "./reports" },
+]
 
 # Etherscan V2 API keys are multi-chain. Only need to define mainnet for evm chains.
 [etherscan]

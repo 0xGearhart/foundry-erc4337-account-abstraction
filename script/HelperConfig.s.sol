@@ -8,12 +8,24 @@ import {EntryPoint} from "lib/account-abstraction/contracts/core/EntryPoint.sol"
 
 contract CodeConstants {
     uint256 constant LOCAL_CHAIN_ID = 31_337;
-    uint256 constant ETH_MAINNET_CHAIN_ID = 1;
-    uint256 constant ETH_SEPOLIA_CHAIN_ID = 11_155_111;
-    uint256 constant ARBITRUM_MAINNET_CHAIN_ID = 42_161;
-    uint256 constant ARBITRUM_SEPOLIA_CHAIN_ID = 421_614;
     uint256 constant ANVIL_DEFAULT_KEY = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
     address constant ANVIL_DEFAULT_ACCOUNT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+
+    uint256 constant ETH_MAINNET_CHAIN_ID = 1;
+    address constant ETH_MAINNET_ENTRY_POINT = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
+    address constant ETH_MAINNET_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+
+    uint256 constant ETH_SEPOLIA_CHAIN_ID = 11_155_111;
+    address constant ETH_SEPOLIA_ENTRY_POINT = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
+    address constant ETH_SEPOLIA_USDC = 0xc25C21b67a9a6cB2220301918B08578E603573b5;
+
+    uint256 constant ARBITRUM_MAINNET_CHAIN_ID = 42_161;
+    address constant ARB_MAINNET_ENTRY_POINT = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
+    address constant ARB_MAINNET_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831;
+
+    uint256 constant ARBITRUM_SEPOLIA_CHAIN_ID = 421_614;
+    address constant ARB_SEPOLIA_ENTRY_POINT = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
+    address constant ARB_SEPOLIA_USDC = 0x50A7224492E22bc8923b77751E3D047c6B47CbDE;
 }
 
 contract HelperConfig is Script, CodeConstants {
@@ -30,7 +42,7 @@ contract HelperConfig is Script, CodeConstants {
     struct NetworkConfig {
         address entryPoint;
         address usdc;
-        address sender;
+        address account;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -58,7 +70,7 @@ contract HelperConfig is Script, CodeConstants {
     function getConfigByChainId(uint256 chainId) public returns (NetworkConfig memory) {
         if (chainId == LOCAL_CHAIN_ID) {
             return _getOrCreateLocalConfig();
-        } else if (networkConfigs[chainId].sender != address(0)) {
+        } else if (networkConfigs[chainId].account != address(0)) {
             return networkConfigs[chainId];
         } else {
             revert HelperConfig__InvalidNetwork(block.chainid);
@@ -71,39 +83,31 @@ contract HelperConfig is Script, CodeConstants {
 
     function _getEthMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032,
-            usdc: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, // need to confirm later
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
-        });
-    }
-
-    function _getArbMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
-        networkConfig = NetworkConfig({
-            entryPoint: 0x0000000071727De22E5E9d8BAf0edAc6f37da032,
-            usdc: 0xaf88d065e77c8cC2239327C5EDb3A432268e5831, // need to confirm later
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            entryPoint: ETH_MAINNET_ENTRY_POINT, usdc: ETH_MAINNET_USDC, account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
     function _getEthSepoliaConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789,
-            usdc: 0xc25C21b67a9a6cB2220301918B08578E603573b5,
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            entryPoint: ETH_SEPOLIA_ENTRY_POINT, usdc: ETH_SEPOLIA_USDC, account: vm.envAddress("DEFAULT_KEY_ADDRESS")
+        });
+    }
+
+    function _getArbMainnetConfig() internal view returns (NetworkConfig memory networkConfig) {
+        networkConfig = NetworkConfig({
+            entryPoint: ARB_MAINNET_ENTRY_POINT, usdc: ARB_MAINNET_USDC, account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
     function _getArbSepoliaConfig() internal view returns (NetworkConfig memory networkConfig) {
         networkConfig = NetworkConfig({
-            entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789,
-            usdc: 0x50A7224492E22bc8923b77751E3D047c6B47CbDE,
-            sender: vm.envAddress("DEFAULT_KEY_ADDRESS")
+            entryPoint: ARB_SEPOLIA_ENTRY_POINT, usdc: ARB_SEPOLIA_USDC, account: vm.envAddress("DEFAULT_KEY_ADDRESS")
         });
     }
 
     function _getOrCreateLocalConfig() internal returns (NetworkConfig memory) {
         // if mocks are already deployed, return struct
-        if (localNetworkConfig.sender != address(0)) {
+        if (localNetworkConfig.account != address(0)) {
             return localNetworkConfig;
         }
         // otherwise, deploy mocks and save struct
@@ -114,7 +118,7 @@ contract HelperConfig is Script, CodeConstants {
         vm.stopBroadcast();
 
         localNetworkConfig =
-            NetworkConfig({entryPoint: address(entryPoint), usdc: address(erc20Mock), sender: ANVIL_DEFAULT_ACCOUNT});
+            NetworkConfig({entryPoint: address(entryPoint), usdc: address(erc20Mock), account: ANVIL_DEFAULT_ACCOUNT});
 
         return localNetworkConfig;
     }

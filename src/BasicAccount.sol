@@ -24,6 +24,13 @@ contract BasicAccount is IAccount, Ownable {
     error BasicAccount__NotFromEntryPoint();
     error BasicAccount__NotFromEntryPointOrOwner();
     error BasicAccount__ExecutionFailed(bytes result);
+    error BasicAccount__WithdrawFailed();
+
+    /*//////////////////////////////////////////////////////////////
+                               LIBRARIES
+    //////////////////////////////////////////////////////////////*/
+
+    using MessageHashUtils for bytes32;
 
     /*//////////////////////////////////////////////////////////////
                                  STATE
@@ -86,18 +93,6 @@ contract BasicAccount is IAccount, Ownable {
         requireFromEntryPoint
         returns (uint256 validationData)
     {
-        // struct PackedUserOperation {
-        //     address sender;                  // this account's address
-        //     uint256 nonce;                   // nonce to prevent replay attacks
-        //     bytes initCode;                  // ignore for deployed accounts
-        //     bytes callData;                  // the operations to be executed (approve, send, etc)
-        //     bytes32 accountGasLimits;        // the amount of gas to allocate the main execution call
-        //     uint256 preVerificationGas;      // the amount of gas to allocate for the verification step
-        //     bytes32 gasFees;                 // extra gas to pay the bundler
-        //     bytes paymasterAndData;          // data for paymaster (only if paymaster exists)
-        //     bytes signature;                 // data passed to sender to verify operation
-        // }
-
         validationData = _validateSignature(userOp, userOpHash);
 
         // usually it is good practice to validate nonce as well
@@ -127,6 +122,20 @@ contract BasicAccount is IAccount, Ownable {
         }
     }
 
+    /**
+     * @notice Only owner can withdraw funds from basic account
+     * @param amount amount of ETH to withdraw
+     */
+    function withdraw(uint256 amount) external onlyOwner {
+        if (amount > address(this).balance) {
+            amount = address(this).balance;
+        }
+        (bool success,) = payable(owner()).call{value: amount}("");
+        if (!success) {
+            revert BasicAccount__WithdrawFailed();
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                            INTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
@@ -145,7 +154,7 @@ contract BasicAccount is IAccount, Ownable {
         returns (uint256 validationData)
     {
         // userOpHash => EIP-191 version of the signed hash
-        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
+        bytes32 ethSignedMessageHash = userOpHash.toEthSignedMessageHash();
         // recover signer from hash
         address signer = ECDSA.recover(ethSignedMessageHash, userOp.signature);
         // verify signer is BasicAccount owner

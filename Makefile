@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all clean deploy fund install snapshot coverageReport gasReport anvil
+.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy sendPackedUserOp
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -12,7 +12,7 @@ clean  :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
-install :; forge install foundry-rs/forge-std@v1.11.0 && forge install openzeppelin/openzeppelin-contracts@v5.5.0 && forge install eth-infinitism/account-abstraction@v0.9.0
+install :; forge install cyfrin/foundry-devops@0.2.2 && forge install foundry-rs/forge-std@v1.11.0 && forge install openzeppelin/openzeppelin-contracts@v5.5.0 && forge install eth-infinitism/account-abstraction@v0.9.0
 
 # Update Dependencies
 update:; forge update
@@ -48,3 +48,6 @@ endif
 
 deploy:
 	@forge script script/DeployBasicAccount.s.sol:DeployBasicAccount $(NETWORK_ARGS)
+
+sendPackedUserOp:
+	@ forge script script/SendPackedUserOp.s.sol:SendPackedUserOp $(NETWORK_ARGS)

@@ -11,7 +11,7 @@ contract DeployBasicAccount is Script {
         HelperConfig helperConfig = new HelperConfig();
         config = helperConfig.getConfig();
 
-        vm.startBroadcast(config.sender);
+        vm.startBroadcast(config.account);
         basicAccount = new BasicAccount(config.entryPoint);
         vm.stopBroadcast();
     }

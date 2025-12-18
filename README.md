@@ -224,8 +224,8 @@ forge verify-contract <CONTRACT_ADDRESS> src/MainContract.sol:MainContract --cha
 
 | Network | Contract Address | Explorer |
 |---------|------------------|----------|
-| Sepolia | `TBD` | [View on Etherscan](https://sepolia.etherscan.io) |
-| Mainnet | `TBD` | [View on Etherscan](https://etherscan.io) |
+| ARB Sepolia | `0xBD2cd0cEF56260d291fc55f4D112d55DAA495226` | [View on Etherscan](https://sepolia.etherscan.io) |
+| ARB Mainnet | `TBD` | [View on Etherscan](https://etherscan.io) |
 
 ## Security
 
