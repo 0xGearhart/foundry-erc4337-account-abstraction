@@ -18,6 +18,7 @@
     - [Testing](#testing)
     - [Test Coverage](#test-coverage)
     - [Deploy Locally](#deploy-locally)
+    - [Deploy Arbitrum Sepolia Testnet](#deploy-arbitrum-sepolia-testnet)
     - [Interact with Contract](#interact-with-contract)
   - [Deployment](#deployment)
     - [Deploy to Testnet](#deploy-to-testnet)
@@ -190,6 +191,21 @@ forge build
 3. **Get testnet ETH:**
    - Sepolia Faucet: [cloud.google.com/application/web3/faucet/ethereum/sepolia](https://cloud.google.com/application/web3/faucet/ethereum/sepolia)
 
+4. **Configure Makefile**
+- Change account name in Makefile to the name of your desired encrypted key 
+  - change "--account defaultKey" to "--account <YOUR_ENCRYPTED_KEY_NAME>"
+  - check encrypted key names stored locally with:
+
+```bash
+cast wallet list
+```
+- **If no encrypted keys found**
+  - Encrypt private key to be used securely within foundry:
+
+```bash
+cast wallet import <account_name> --interactive
+```
+
 **⚠️ Security Warning:**
 - Never commit your `.env` file
 - Never use your mainnet private key for testing
@@ -247,6 +263,12 @@ Deploy to local node (in another terminal):
 make deploy
 ```
 
+### Deploy Arbitrum Sepolia Testnet
+
+```bash
+make deploy ARGS="--network arb sepolia"
+```
+
 ### Interact with Contract
 
 You can interact with the BasicAccount contract using Foundry's `cast` command or through the provided scripts.
@@ -273,6 +295,9 @@ export SECONDARY_ADDRESS=0x... # address to approve USDC to
 
 # Run the script that creates and sends a user operation
 forge script script/SendPackedUserOp.s.sol:SendPackedUserOp --rpc-url $ARB_SEPOLIA_RPC_URL --account defaultKey --broadcast -vvvv
+
+# Or more simply with make commands
+make sendPackedUserOp ARGS="--network arb sepolia"
 ```
 
 **5. Execute a transaction as owner:**
