@@ -95,7 +95,7 @@ contract BasicAccount is IAccount, Ownable {
     {
         validationData = _validateSignature(userOp, userOpHash);
 
-        // usually it is good practice to validate nonce as well
+        // usually it is good practice to validate nonce as well but entrypoint will ensure nonce uniqueness
         // _validateNonce();
 
         // repay entrypoint contract
