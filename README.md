@@ -392,7 +392,7 @@ The BasicAccount implements two-level access control using OpenZeppelin's `Ownab
 
 - **Single Signer Model**: Only one owner can validate operations - no multi-sig support. Consider using a multi-sig wallet as the owner in production.
 
-- **No Nonce Validation**: The `validateUserOp()` function doesn't validate nonces (see commented code). This must be implemented to prevent replay attacks across different EntryPoints.
+- **No Nonce Validation**: The `validateUserOp()` function doesn't validate nonces but the entry point contract ensures uniqueness. Not strictly needed but could add logic to ensure ordered execution or some other logic.
 
 - **Basic Signature Scheme**: Uses simple ECDSA with EOA signatures. No support for account abstraction-specific features like batching or scheduled operations.
 
