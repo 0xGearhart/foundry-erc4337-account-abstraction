@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import {BasicAccount} from "../src/BasicAccount.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";

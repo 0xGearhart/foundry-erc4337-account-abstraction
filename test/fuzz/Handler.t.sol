@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {SendPackedUserOp} from "../../script/SendPackedUserOp.s.sol";
