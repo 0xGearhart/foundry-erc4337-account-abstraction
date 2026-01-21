@@ -1,10 +1,10 @@
-# Foundry ERC4337 Account Abstraction
+# ERC4337 Account Abstraction
 
 **⚠️ This project is not audited, use at your own risk**
 
 ## Table of Contents
 
-- [Foundry ERC4337 Account Abstraction](#foundry-erc4337-account-abstraction)
+- [ERC4337 Account Abstraction](#erc4337-account-abstraction)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
     - [Key Features](#key-features)
@@ -48,7 +48,7 @@ This is an educational implementation of an ERC-4337 (Account Abstraction) smart
 - **Educational Design**: Simple, well-commented code for learning Account Abstraction concepts
 
 **Tech Stack:**
-- Solidity ^0.8.24
+- Solidity 0.8.24
 - Foundry (testing & deployment)
 - OpenZeppelin Contracts (Ownable, ECDSA)
 - ERC-4337 Account Abstraction Contracts
@@ -126,7 +126,7 @@ This is an educational implementation of an ERC-4337 (Account Abstraction) smart
 
 **Repository Structure:**
 ```        
-foundry-erc4337-account-abstraction/
+erc4337-account-abstraction/
 ├── src/
 │   └── BasicAccount.sol               # ERC-4337 Smart Wallet Implementation
 ├── script/
@@ -165,10 +165,9 @@ foundry-erc4337-account-abstraction/
 ### Quickstart
 
 ```bash
-git clone https://github.com/0xGearhart/foundry-account-abstraction-basic
-cd foundry-account-abstraction-basic
-make install
-forge build
+git clone https://github.com/0xGearhart/erc4337-account-abstraction
+cd erc4337-account-abstraction
+make
 ```
 
 ### Environment Setup
@@ -249,6 +248,12 @@ Generate coverage report:
 forge coverage
 ```
 
+Create test coverage report and save to .txt file:
+
+```bash
+make coverage-report
+```
+
 ### Deploy Locally
 
 Start a local Anvil node:
@@ -297,7 +302,7 @@ export SECONDARY_ADDRESS=0x... # address to approve USDC to
 forge script script/SendPackedUserOp.s.sol:SendPackedUserOp --rpc-url $ARB_SEPOLIA_RPC_URL --account defaultKey --broadcast -vvvv
 
 # Or more simply with make commands
-make sendPackedUserOp ARGS="--network arb sepolia"
+make send-packed-user-op ARGS="--network arb sepolia"
 ```
 
 **5. Execute a transaction as owner:**
@@ -333,10 +338,10 @@ forge verify-contract <CONTRACT_ADDRESS> src/MainContract.sol:MainContract --cha
 
 ### Deployment Addresses
 
-| Network | Contract Address | Explorer |
-|---------|------------------|----------|
+| Network     | Contract Address                             | Explorer                                          |
+| ----------- | -------------------------------------------- | ------------------------------------------------- |
 | ARB Sepolia | `0xBD2cd0cEF56260d291fc55f4D112d55DAA495226` | [View on Etherscan](https://sepolia.etherscan.io) |
-| ARB Mainnet | `TBD` | [View on Etherscan](https://etherscan.io) |
+| ARB Mainnet | `TBD`                                        | [View on Etherscan](https://etherscan.io)         |
 
 ## Security
 
@@ -369,13 +374,13 @@ The BasicAccount implements two-level access control using OpenZeppelin's `Ownab
 
 **Access Control Matrix:**
 
-| Function | Owner | EntryPoint | Other |
-|----------|-------|-----------|-------|
-| `receive()` | ✓ | ✓ | ✓ |
-| `validateUserOp()` | ✗ | ✓ | ✗ |
-| `execute()` | ✓ | ✓ | ✗ |
-| `withdraw()` | ✓ | ✗ | ✗ |
-| `getEntryPoint()` | ✓ | ✓ | ✓ |
+| Function           | Owner | EntryPoint | Other |
+| ------------------ | ----- | ---------- | ----- |
+| `receive()`        | ✓     | ✓          | ✓     |
+| `validateUserOp()` | ✗     | ✓          | ✗     |
+| `execute()`        | ✓     | ✓          | ✗     |
+| `withdraw()`       | ✓     | ✗          | ✗     |
+| `getEntryPoint()`  | ✓     | ✓          | ✓     |
 
 **Access Control Vulnerabilities & Mitigations:**
 
@@ -414,17 +419,17 @@ The BasicAccount implements two-level access control using OpenZeppelin's `Ownab
 
 ## Gas Optimization
 
-| Function | Operation | Typical Gas Cost |
-|----------|-----------|------------------|
-| `validateUserOp()` | Signature validation | ~35-41k |
-| `execute()` | Call execution (varies by target) | ~25k+ |
-| `withdraw()` | Fund withdrawal | ~24-32k |
-| `receive()` | Receive ETH | ~21k |
+| Function           | Operation                         | Typical Gas Cost |
+| ------------------ | --------------------------------- | ---------------- |
+| `validateUserOp()` | Signature validation              | ~35-41k          |
+| `execute()`        | Call execution (varies by target) | ~25k+            |
+| `withdraw()`       | Fund withdrawal                   | ~24-32k          |
+| `receive()`        | Receive ETH                       | ~21k             |
 
-Generate gas report:
+Generate gas report and save to .txt file:
 
 ```bash
-forge test --gas-report
+make gas-report
 ```
 
 Generate gas snapshot:

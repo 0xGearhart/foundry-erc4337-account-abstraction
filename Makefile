@@ -1,10 +1,10 @@
 -include .env
 
-.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy sendPackedUserOp
+.PHONY: all clean remove install update snapshot coverage-report gas-report anvil deploy send-packed-user-op
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
-all: clean remove install update build
+all: clean remove install build
 
 # Clean the repo
 clean  :; forge clean
@@ -17,14 +17,16 @@ install :; forge install cyfrin/foundry-devops@0.2.2 && forge install foundry-rs
 # Update Dependencies
 update:; forge update
 
+build:; forge build
+
 # Create test coverage report and save to .txt file
-coverageReport :; forge coverage --report debug > coverage.txt
+coverage-report :; forge coverage --report debug > coverage.txt
 
 # Generate Gas Snapshot
 snapshot :; forge snapshot
 
 # Generate table showing gas cost for each function
-gasReport :; forge test --gas-report
+gas-report :; forge test --gas-report
 
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
 
@@ -49,5 +51,5 @@ endif
 deploy:
 	@forge script script/DeployBasicAccount.s.sol:DeployBasicAccount $(NETWORK_ARGS)
 
-sendPackedUserOp:
+send-packed-user-op:
 	@ forge script script/SendPackedUserOp.s.sol:SendPackedUserOp $(NETWORK_ARGS)
